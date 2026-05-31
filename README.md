@@ -1,91 +1,119 @@
 # hiddify-vless-xhttp-parser
 
-Aggregates **VLESS + XHTTP** configs from popular public GitHub collectors, keeps
-**only** nodes hosted on *known* networks (VK, Yandex, Cloudflare/CDN, Google,
-Beeline), speed-tests the survivors and emits a ready-to-import **Hiddify**
-subscription.
+Парсер-агрегатор **VLESS + XHTTP** конфигов из популярных публичных GitHub-коллекторов.
+Оставляет **только** узлы, размещённые в **известных российских сетях**
+(VK, Yandex, MTS, Beeline, MegaFon, Rostelecom, Tele2, ER-Telecom, TTK),
+тестирует их скорость и формирует готовую подписку для **Hiddify**.
 
-Built in Rust. Designed to run unattended via GitHub Actions.
+Написан на Rust. Рассчитан на автономную работу через GitHub Actions.
 
-## Why these constraints
+> Эксклюзивно для приложения **Hiddify**.
 
-| Requirement | How it is implemented |
+## 🌐 Сайт подписки
+
+Красивая страница подписки (как у VPN-сервисов) на GitHub Pages:
+кнопка «Добавить в Hiddify», QR-код, копирование ссылки и live-статистика серверов.
+
+**https://lanopivijo93782-ops.github.io/hiddify-vless-xhttp-parser/**
+
+## Почему такие ограничения
+
+| Требование | Как реализовано |
 |---|---|
-| **VLESS + XHTTP only** | Every parsed share-link is checked: `protocol == vless` and `type ∈ {xhttp, splithttp}` (`splithttp` is XHTTP's former name). Everything else is dropped. |
-| **Only known servers (VK / Yandex / CDN / Google / Beeline)** | Each node's host is resolved to an IP and matched against curated provider CIDR sets in [`data/cidr/`](data/cidr). Nodes outside those ranges are discarded. The ranges are refreshable from RIPEstat via `update-cidr`. |
-| **Max internet speed (test with URL)** | Two-stage ranking: a TCP-handshake **latency** test for every node (no proxy core needed), plus an optional **real download throughput** test that routes a test URL through each node using a `sing-box` core. Nodes are ranked best-first. |
-| **Exclusively for Hiddify** | Output is a standard base64 subscription (`sub/subscription.txt`) plus the raw `sub/vless.txt`, both of which Hiddify imports directly. |
-| **GitHub Actions** | [`update.yml`](.github/workflows/update.yml) rebuilds the subscription on a schedule and commits it; [`ci.yml`](.github/workflows/ci.yml) runs fmt/clippy/tests. |
+| **Только VLESS + XHTTP** | Каждая ссылка проверяется: `protocol == vless` и `type ∈ {xhttp, splithttp}` (`splithttp` — прежнее название XHTTP). Всё остальное отбрасывается. |
+| **Только известные российские сети** | Хост каждого узла резолвится в IP и сверяется с CIDR-наборами провайдеров в [`data/cidr/`](data/cidr). Узлы вне этих диапазонов отбрасываются. Только российские сети, чьи IP в РФ не блокируют. Диапазоны обновляются из RIPEstat командой `update-cidr`. |
+| **Максимальная скорость (тест по URL)** | Двухэтапное ранжирование: тест **латентности** TCP-рукопожатия для каждого узла (без ядра-прокси) плюс опциональный **реальный тест скорости скачивания**, который пропускает тестовый URL через каждый узел с помощью ядра `sing-box`. Лучшие — первыми. |
+| **Имена ключей `[флаг]:[провайдер]`** | Имя каждого ключа переписывается в формат `🇷🇺:YA #01 · 35ms` — флаг страны эмодзи (без слов) + короткое имя провайдера + ранг + скорость. |
+| **Эксклюзивно для Hiddify** | На выходе — стандартная base64-подписка (`sub/subscription.txt`) и сырой `sub/vless.txt`, оба импортируются в Hiddify напрямую. |
+| **GitHub Actions** | [`update.yml`](.github/workflows/update.yml) пересобирает подписку по расписанию и коммитит её; [`ci.yml`](.github/workflows/ci.yml) запускает fmt/clippy/тесты. |
 
-## Pipeline
+## Российские провайдеры (белый список)
+
+Префиксы получены реально из RIPEstat по ASN каждого провайдера:
+
+| Провайдер | Имя ключа | ASN |
+|---|---|---|
+| ВКонтакте | `VK` | AS47764, 47541, 47542, 28709 |
+| Яндекс | `YA` | AS13238, 200350 |
+| МТС | `MTS` | AS8359, 25513 |
+| Билайн | `Beeline` | AS3216, 8402, 16345 |
+| МегаФон | `MegaFon` | AS31133, 25159, 31163 |
+| Ростелеком | `Rostelecom` | AS12389, 42610, 8997 |
+| Теле2 | `Tele2` | AS48092, 41330 |
+| ЭР-Телеком | `ER-Telecom` | AS9049, 50543, 39435 |
+| ТТК | `TTK` | AS20485 |
+
+## Конвейер
 
 ```
-sources.txt ──fetch──► extract vless:// (+base64 decode)
-            ──filter─► VLESS && XHTTP, de-duplicate
-            ──resolve► host → IP
-            ──CIDR───► keep VK / Yandex / Cloudflare / Google / Beeline
-            ──test───► TCP latency  (+ optional sing-box throughput)
-            ──rank───► best first, cap to --max-nodes
-            ──emit───► sub/vless.txt + sub/subscription.txt + sub/report.json
+sources.txt ──скачать─► извлечь vless:// (+декод base64)
+            ──фильтр──► VLESS && XHTTP, дедупликация
+            ──резолв──► хост → IP
+            ──CIDR────► оставить VK / YA / MTS / Beeline / MegaFon / ...
+            ──тест────► латентность TCP (+ опц. скорость через sing-box)
+            ──ранг────► лучшие первыми, ограничение --max-nodes
+            ──вывод───► sub/vless.txt + sub/subscription.txt + sub/report.json
 ```
 
-## Usage
+## Использование
 
 ```bash
-# Full pipeline with the embedded sources & CIDR ranges:
+# Полный конвейер со встроенными источниками и CIDR-диапазонами:
 cargo run --release -- run
 
-# Useful flags:
+# Полезные флаги:
 cargo run --release -- run \
-  --max-nodes 200 \           # cap final list
-  --connect-timeout-ms 2500 \ # latency-test timeout
-  --out sub                   # output directory
+  --max-nodes 200 \           # ограничить итоговый список
+  --connect-timeout-ms 2500 \ # таймаут теста латентности
+  --out sub                   # каталог вывода
 
-# Real download-speed test through each node (needs a sing-box binary):
+# Реальный тест скорости скачивания через каждый узел (нужен бинарь sing-box):
 cargo run --release -- run --core-bin /usr/local/bin/sing-box \
   --test-url https://speed.cloudflare.com/__down?bytes=10000000 \
   --throughput-secs 8 --throughput-top 30
 
-# Refresh provider CIDR ranges from RIPEstat:
+# Обновить CIDR-диапазоны провайдеров из RIPEstat:
 cargo run --release -- update-cidr --out data/cidr
 ```
 
-### Importing into Hiddify
+### Импорт в Hiddify
 
-Add the raw URL of `sub/subscription.txt` (or `sub/vless.txt`) as a profile in
-Hiddify:
+Добавьте сырой URL `sub/subscription.txt` как профиль в Hiddify:
 
 ```
 https://raw.githubusercontent.com/lanopivijo93782-ops/hiddify-vless-xhttp-parser/main/sub/subscription.txt
 ```
 
-Hiddify auto-refreshes the profile; the GitHub Action keeps the file up to date.
+Или просто откройте [сайт подписки](https://lanopivijo93782-ops.github.io/hiddify-vless-xhttp-parser/)
+и нажмите «Добавить в Hiddify». Hiddify сам обновляет профиль, а GitHub Action
+поддерживает файл в актуальном состоянии.
 
-## Outputs
+## Выходные файлы
 
-* `sub/vless.txt` — newline-separated `vless://` links, remarks rewritten to
-  `NN | Provider | xhttp | <latency or Mbps>`, ranked best-first.
-* `sub/subscription.txt` — base64 of `vless.txt` (the format Hiddify imports).
-* `sub/report.json` — run stats (`total`, `by_provider`, `generated_at`).
+* `sub/vless.txt` — `vless://` ссылки по строкам, имена переписаны в
+  `🇷🇺:Провайдер #NN · <латентность или Mbps>`, лучшие первыми.
+* `sub/subscription.txt` — base64 от `vless.txt` (формат импорта Hiddify).
+* `sub/report.json` — статистика прогона (`total`, `by_provider`, `generated_at`).
 
-## Configuration files
+## Файлы конфигурации
 
-* [`data/sources.txt`](data/sources.txt) — subscription sources, one URL per
-  line (`#` comments allowed). Dead links are skipped with a warning.
-* [`data/cidr/*.txt`](data/cidr) — one file per provider; filename = provider
-  name; CIDR per line.
+* [`data/sources.txt`](data/sources.txt) — источники подписок, по URL на строку
+  (`#` — комментарии). Битые ссылки пропускаются с предупреждением.
+* [`data/cidr/*.txt`](data/cidr) — по файлу на провайдера; имя файла = имя
+  провайдера; по CIDR на строку.
 
-Both are embedded into the binary as defaults and can be overridden with
+Оба встроены в бинарь как значения по умолчанию и переопределяются флагами
 `--sources` / `--cidr-dir`.
 
-## Notes on provider coverage
+## О покрытии провайдеров
 
-`Cloudflare` dominates real-world public VLESS+XHTTP configs because most are
-fronted behind Cloudflare's CDN — exactly the "known CDN" case this tool targets.
-VK / Yandex / Beeline / Google ranges are included so any nodes hosted there are
-kept too. Refresh the ranges with `update-cidr` to track ASN changes.
+Белый список содержит **только российские сети**, чьи IP в РФ не блокируют.
+Публичные VLESS+XHTTP конфиги в основном размещены за иностранными CDN, поэтому
+после жёсткого фильтра «только РФ» итоговых узлов может быть немного — это прямое
+следствие требования. Обновляйте диапазоны командой `update-cidr` для отслеживания
+изменений ASN.
 
-## Development
+## Разработка
 
 ```bash
 cargo fmt --all
@@ -93,6 +121,6 @@ cargo clippy --all-targets -- -D warnings
 cargo test --all
 ```
 
-## License
+## Лицензия
 
-MIT — see [LICENSE](LICENSE).
+MIT — см. [LICENSE](LICENSE).

@@ -1,9 +1,10 @@
-//! Provider CIDR database used to keep only nodes hosted on "known" networks
-//! (VK, Yandex, Cloudflare, Google, Beeline, ...).
+//! База CIDR провайдеров: оставляем только узлы в известных российских сетях
+//! (VK, Yandex, MTS, Beeline, MegaFon, Rostelecom, Tele2, ER-Telecom, TTK).
+//! Только сети, чьи IP в РФ не блокируют.
 //!
-//! Default ranges are embedded at compile time so the binary works fully
-//! offline. They can be overridden from a directory at runtime, and refreshed
-//! from authoritative sources via [`fetch_provider_prefixes`].
+//! Диапазоны по умолчанию встроены в бинарь на этапе компиляции, поэтому он
+//! работает полностью офлайн. Их можно переопределить каталогом во время
+//! выполнения и обновить из RIPEstat через [`fetch_provider_prefixes`].
 
 use std::net::IpAddr;
 use std::path::Path;
@@ -11,22 +12,32 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use ipnetwork::IpNetwork;
 
-/// Embedded default ranges: (provider, file contents).
+/// Встроенные диапазоны по умолчанию: (провайдер, содержимое файла).
+/// Только российские сети, чьи IP в РФ не блокируют.
 const EMBEDDED: &[(&str, &str)] = &[
     ("vk", include_str!("../data/cidr/vk.txt")),
     ("yandex", include_str!("../data/cidr/yandex.txt")),
-    ("cloudflare", include_str!("../data/cidr/cloudflare.txt")),
-    ("google", include_str!("../data/cidr/google.txt")),
+    ("mts", include_str!("../data/cidr/mts.txt")),
     ("beeline", include_str!("../data/cidr/beeline.txt")),
+    ("megafon", include_str!("../data/cidr/megafon.txt")),
+    ("rostelecom", include_str!("../data/cidr/rostelecom.txt")),
+    ("tele2", include_str!("../data/cidr/tele2.txt")),
+    ("ertelecom", include_str!("../data/cidr/ertelecom.txt")),
+    ("ttk", include_str!("../data/cidr/ttk.txt")),
 ];
 
-/// ASNs per provider, used by `update-cidr` to refresh ranges from RIPEstat.
+/// ASN каждого провайдера — используются `update-cidr` для загрузки префиксов
+/// из RIPEstat. Все провайдеры — крупные российские операторы/сервисы.
 pub const PROVIDER_ASNS: &[(&str, &[u32])] = &[
     ("vk", &[47764, 47541, 47542, 28709]),
     ("yandex", &[13238, 200350]),
-    ("cloudflare", &[13335]),
-    ("google", &[15169]),
-    ("beeline", &[8402, 3216, 16345]),
+    ("mts", &[8359, 25513]),
+    ("beeline", &[3216, 8402, 16345]),
+    ("megafon", &[31133, 25159, 31163]),
+    ("rostelecom", &[12389, 42610, 8997]),
+    ("tele2", &[48092, 41330]),
+    ("ertelecom", &[9049, 50543, 39435]),
+    ("ttk", &[20485]),
 ];
 
 #[derive(Debug, Clone)]
@@ -178,7 +189,7 @@ pub fn render_provider_file(provider: &str, asns: &[u32], prefixes: &[String]) -
         .collect::<Vec<_>>()
         .join(", ");
     let mut out = format!(
-        "# {provider} ranges. ASN: {asn_list}.\n# Refresh with: hiddify-parser update-cidr\n"
+        "# Диапазоны {provider}. ASN: {asn_list}.\n# Обновление: hiddify-parser update-cidr\n"
     );
     for p in prefixes {
         out.push_str(p);
@@ -195,14 +206,7 @@ mod tests {
     fn embedded_db_is_populated() {
         let db = ProviderDb::embedded();
         assert!(db.len() > 30, "expected many ranges, got {}", db.len());
-        assert_eq!(db.summary().len(), 5);
-    }
-
-    #[test]
-    fn matches_cloudflare_ip() {
-        let db = ProviderDb::embedded();
-        let ip: IpAddr = "104.16.0.1".parse().unwrap();
-        assert_eq!(db.match_ip(ip), Some("cloudflare"));
+        assert_eq!(db.summary().len(), PROVIDER_ASNS.len());
     }
 
     #[test]
@@ -210,6 +214,13 @@ mod tests {
         let db = ProviderDb::embedded();
         let ip: IpAddr = "77.88.55.88".parse().unwrap();
         assert_eq!(db.match_ip(ip), Some("yandex"));
+    }
+
+    #[test]
+    fn matches_vk_ip() {
+        let db = ProviderDb::embedded();
+        let ip: IpAddr = "87.240.190.78".parse().unwrap();
+        assert_eq!(db.match_ip(ip), Some("vk"));
     }
 
     #[test]

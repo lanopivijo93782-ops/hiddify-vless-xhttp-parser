@@ -8,25 +8,35 @@ use serde::Serialize;
 
 use crate::speedtest::TestedNode;
 
-/// Human-friendly provider labels used in node remarks.
+/// Короткое имя провайдера для отображения в имени ключа.
 fn provider_label(provider: &str) -> &str {
     match provider {
         "vk" => "VK",
-        "yandex" => "Yandex",
-        "cloudflare" => "Cloudflare",
-        "google" => "Google",
+        "yandex" => "YA",
+        "mts" => "MTS",
         "beeline" => "Beeline",
+        "megafon" => "MegaFon",
+        "rostelecom" => "Rostelecom",
+        "tele2" => "Tele2",
+        "ertelecom" => "ER-Telecom",
+        "ttk" => "TTK",
         other => other,
     }
 }
 
-/// Rewrite each node's remark to a consistent, sortable label and return the
-/// list of `vless://` links in ranked order.
+/// Флаг страны провайдера (эмодзи, без текста). Белый список — только РФ.
+fn provider_flag(_provider: &str) -> &str {
+    "\u{1F1F7}\u{1F1FA}" // 🇷🇺
+}
+
+/// Переписывает имя каждого ключа в формат `[флаг]:[провайдер]` и возвращает
+/// список `vless://` ссылок в порядке ранжирования (лучшие первыми).
 pub fn render_links(tested: &[TestedNode]) -> Vec<String> {
     let mut links = Vec::with_capacity(tested.len());
     for (i, t) in tested.iter().enumerate() {
         let mut node = t.node.clone();
         let label = provider_label(&t.provider);
+        let flag = provider_flag(&t.provider);
         let speed = match t.throughput_kbps {
             Some(kbps) => format!("{:.1}Mbps", kbps / 1000.0),
             None => match t.latency {
@@ -34,7 +44,14 @@ pub fn render_links(tested: &[TestedNode]) -> Vec<String> {
                 None => "n/a".to_string(),
             },
         };
-        node.set_remark(format!("{:02} | {} | xhttp | {}", i + 1, label, speed));
+        // Формат имени ключа: "🇷🇺:YA #01 · 35ms"
+        node.set_remark(format!(
+            "{}:{} #{:02} \u{00B7} {}",
+            flag,
+            label,
+            i + 1,
+            speed
+        ));
         links.push(node.to_string());
     }
     links
@@ -91,11 +108,12 @@ mod tests {
 
     #[test]
     fn render_sets_remark_and_keeps_link_valid() {
-        let links = render_links(&[tested("cloudflare", 42)]);
+        let links = render_links(&[tested("yandex", 42)]);
         assert_eq!(links.len(), 1);
         let parsed = VlessNode::parse(&links[0]).unwrap();
-        assert!(parsed.remark.contains("Cloudflare"));
-        assert!(parsed.remark.contains("xhttp"));
+        assert!(parsed.remark.contains("YA"));
+        assert!(parsed.remark.contains('\u{1F1F7}')); // 🇷🇺
+        assert!(parsed.remark.contains("#01"));
         assert!(parsed.is_xhttp());
     }
 

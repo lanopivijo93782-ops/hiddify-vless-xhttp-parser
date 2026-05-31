@@ -17,8 +17,9 @@ use crate::cidr::ProviderDb;
 use crate::speedtest::TestedNode;
 use crate::vless::VlessNode;
 
-/// VLESS + XHTTP aggregator for Hiddify: collect, filter to known networks
-/// (VK / Yandex / Cloudflare / Google / Beeline), speed-test and rank.
+/// Агрегатор VLESS + XHTTP для Hiddify: собирает конфиги, фильтрует
+/// только российские сети (VK / Yandex / MTS / Beeline / MegaFon / Rostelecom /
+/// Tele2 / ER-Telecom / TTK), тестирует скорость и ранжирует.
 #[derive(Parser, Debug)]
 #[command(name = "hiddify-parser", version, about)]
 struct Cli {
@@ -31,65 +32,65 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Command {
-    /// Run the full pipeline (default).
+    /// Запустить полный конвейер (по умолчанию).
     Run(RunArgs),
-    /// Refresh data/cidr/*.txt from RIPEstat for all known providers.
+    /// Обновить data/cidr/*.txt из RIPEstat для всех провайдеров.
     UpdateCidr(UpdateCidrArgs),
 }
 
 #[derive(Parser, Debug, Clone)]
 struct RunArgs {
-    /// Source list file (one URL per line). Uses the embedded list if omitted.
+    /// Файл со списком источников (по URL на строку). Без него — встроенный список.
     #[arg(long)]
     sources: Option<PathBuf>,
 
-    /// Directory of provider CIDR files. Uses embedded ranges if omitted.
+    /// Каталог с CIDR-файлами провайдеров. Без него — встроенные диапазоны.
     #[arg(long)]
     cidr_dir: Option<PathBuf>,
 
-    /// Output directory for the subscription artifacts.
+    /// Каталог для файлов подписки.
     #[arg(long, default_value = "sub")]
     out: PathBuf,
 
-    /// Max concurrent network operations.
+    /// Максимум одновременных сетевых операций.
     #[arg(long, default_value_t = 128)]
     concurrency: usize,
 
-    /// TCP connect timeout for the latency test (milliseconds).
+    /// Таймаут TCP-подключения для теста латентности (мс).
     #[arg(long, default_value_t = 2500)]
     connect_timeout_ms: u64,
 
-    /// Keep at most this many nodes in the final subscription (0 = unlimited).
+    /// Оставить не более N узлов в итоговой подписке (0 = без лимита).
     #[arg(long, default_value_t = 200)]
     max_nodes: usize,
 
-    /// Disable the CIDR/provider filter (debugging only).
+    /// Отключить CIDR-фильтр провайдеров (только для отладки).
     #[arg(long, default_value_t = false)]
     no_cidr_filter: bool,
 
-    /// Path to a sing-box binary to enable the real download-speed test.
+    /// Путь к sing-box для реального теста скорости скачивания.
     #[arg(long)]
     core_bin: Option<PathBuf>,
 
-    /// URL used for the real download-speed test.
+    /// URL для реального теста скорости скачивания.
     #[arg(
         long,
         default_value = "https://speed.cloudflare.com/__down?bytes=10000000"
     )]
     test_url: String,
 
-    /// Duration of each throughput test (seconds).
+    /// Длительность каждого теста скорости (сек).
     #[arg(long, default_value_t = 8)]
     throughput_secs: u64,
 
-    /// Run the throughput test only on the top N latency-ranked nodes.
+    /// Тест скорости только для топ-N узлов по латентности.
     #[arg(long, default_value_t = 30)]
     throughput_top: usize,
 }
 
 #[derive(Parser, Debug)]
 struct UpdateCidrArgs {
-    /// Directory to write provider CIDR files into.
+    /// Каталог для записи CIDR-файлов провайдеров.
     #[arg(long, default_value = "data/cidr")]
     out: PathBuf,
 }
@@ -132,12 +133,12 @@ async fn run(args: RunArgs) -> Result<()> {
         }
         None => sources::default_sources(),
     };
-    tracing::info!(count = urls.len(), "loaded sources");
+    tracing::info!(count = urls.len(), "источники загружены");
 
     // 2. Fetch all sources concurrently.
     let fetched = sources::fetch_all(&client, &urls, args.concurrency.min(32)).await;
     let ok = fetched.iter().filter(|f| f.body.is_some()).count();
-    tracing::info!(ok, total = urls.len(), "fetched sources");
+    tracing::info!(ok, total = urls.len(), "источники скачаны");
 
     // 3. Extract + parse + keep only VLESS/XHTTP, then de-duplicate.
     let mut by_key: BTreeMap<String, VlessNode> = BTreeMap::new();
@@ -159,7 +160,7 @@ async fn run(args: RunArgs) -> Result<()> {
     tracing::info!(
         raw_links,
         xhttp_unique = nodes.len(),
-        "extracted VLESS+XHTTP nodes"
+        "извлечены узлы VLESS+XHTTP"
     );
 
     // 4. Load CIDR DB.
@@ -167,7 +168,7 @@ async fn run(args: RunArgs) -> Result<()> {
         Some(dir) => ProviderDb::from_dir(dir)?,
         None => ProviderDb::embedded(),
     };
-    tracing::info!(ranges = db.len(), providers = ?db.summary(), "loaded CIDR database");
+    tracing::info!(ranges = db.len(), providers = ?db.summary(), "база CIDR загружена");
 
     // 5. Resolve + CIDR filter + latency test (concurrent).
     let timeout = Duration::from_millis(args.connect_timeout_ms);
@@ -200,7 +201,7 @@ async fn run(args: RunArgs) -> Result<()> {
     // Keep only reachable nodes.
     tested.retain(|t| t.is_reachable());
     tested.sort_by(|a, b| b.score().partial_cmp(&a.score()).unwrap());
-    tracing::info!(reachable = tested.len(), "passed CIDR + reachability");
+    tracing::info!(reachable = tested.len(), "прошли CIDR + доступность");
 
     // 6. Optional real throughput test on the top latency-ranked nodes.
     if let Some(core_bin) = &args.core_bin {
@@ -229,10 +230,10 @@ async fn run(args: RunArgs) -> Result<()> {
         final = links.len(),
         by_provider = ?by_provider,
         out = %args.out.display(),
-        "wrote subscription"
+        "подписка записана"
     );
     println!(
-        "Done: {} VLESS+XHTTP nodes written to {} ({:?})",
+        "Готово: {} узлов VLESS+XHTTP записано в {} ({:?})",
         links.len(),
         args.out.display(),
         by_provider
@@ -247,7 +248,7 @@ async fn run_throughput_tests(core_bin: &Path, args: &RunArgs, tested: &mut [Tes
         return;
     }
     let top = args.throughput_top.min(tested.len());
-    tracing::info!(top, "running real throughput tests");
+    tracing::info!(top, "реальные тесты скорости");
     let dur = Duration::from_secs(args.throughput_secs);
     for (i, t) in tested.iter_mut().take(top).enumerate() {
         let socks_port = 21080 + (i as u16 % 4000);
@@ -277,13 +278,13 @@ async fn update_cidr(args: UpdateCidrArgs) -> Result<()> {
     std::fs::create_dir_all(&args.out)
         .with_context(|| format!("creating {}", args.out.display()))?;
     for (provider, asns) in cidr::PROVIDER_ASNS {
-        tracing::info!(provider, ?asns, "fetching prefixes");
+        tracing::info!(provider, ?asns, "загрузка префиксов");
         let prefixes = cidr::fetch_provider_prefixes(&client, asns).await?;
         let body = cidr::render_provider_file(provider, asns, &prefixes);
         let path = args.out.join(format!("{provider}.txt"));
         std::fs::write(&path, body).with_context(|| format!("writing {}", path.display()))?;
         println!(
-            "{provider}: {} prefixes -> {}",
+            "{provider}: {} префиксов -> {}",
             prefixes.len(),
             path.display()
         );

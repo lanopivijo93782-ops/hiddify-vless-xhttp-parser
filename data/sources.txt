@@ -1,10 +1,11 @@
-# Public subscription sources aggregated from popular GitHub VPN-config collectors.
-# One URL per line. Lines starting with '#' are ignored.
-# Content may be plain text or base64; VLESS share-links are extracted from both.
-# These are filtered down to VLESS + XHTTP on known networks by the pipeline,
-# so listing broad aggregators here is fine.
-# All URLs below were verified reachable (HTTP 200). Dead links are skipped at
-# runtime with a warning, so the pipeline is resilient to sources going away.
+# Источники подписок — публичные GitHub-коллекторы VPN-конфигов.
+# Одна ссылка на строку. Строки, начинающиеся с '#', игнорируются.
+# Содержимое может быть как обычным текстом, так и base64 — из обоих
+# извлекаются vless:// ссылки. Затем всё фильтруется до VLESS + XHTTP
+# на известных российских сетях.
+# Все ссылки проверены на доступность (HTTP 200). Недоступные источники
+# пропускаются во время выполнения с предупреждением — конвейер устойчив
+# к исчезновению источников.
 
 # barry-far/V2ray-Config
 https://raw.githubusercontent.com/barry-far/V2ray-Config/main/All_Configs_Sub.txt
@@ -14,7 +15,7 @@ https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protoc
 https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/vless.txt
 https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/All_Configs_Sub.txt
 
-# mahdibland aggregators
+# mahdibland (V2RayAggregator / ShadowsocksAggregator)
 https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt
 https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/Eternity.txt
 
@@ -30,3 +31,39 @@ https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/server.txt
 
 # Pawdroid/Free-servers
 https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub
+
+# freefq/free
+https://raw.githubusercontent.com/freefq/free/master/v2
+
+# ts-sf/fly
+https://raw.githubusercontent.com/ts-sf/fly/main/v2
+
+# Leon406/SubCrawler
+https://raw.githubusercontent.com/Leon406/SubCrawler/main/sub/share/vless
+
+# peasoft/NoMoreWalls
+https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.txt
+
+# ermaozi/get_subscribe
+https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt
+
+# mfuu/v2ray
+https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray
+
+# learnhard-cn/free_proxy_ss
+https://raw.githubusercontent.com/learnhard-cn/free_proxy_ss/main/free
+
+# w1770946466/Auto_proxy
+https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription_num
+
+# Kwinshadow/TelegramV2rayCollector
+https://raw.githubusercontent.com/Kwinshadow/TelegramV2rayCollector/main/sublinks/vless.txt
+
+# V2RayRoot/V2RayConfig
+https://raw.githubusercontent.com/V2RayRoot/V2RayConfig/main/Config/vless.txt
+
+# roosterkid/openproxylist
+https://raw.githubusercontent.com/roosterkid/openproxylist/main/V2RAY_RAW.txt
+
+# 4n0nymou3/multi-proxy-config-fetcher
+https://raw.githubusercontent.com/4n0nymou3/multi-proxy-config-fetcher/main/configs/proxy_configs.txt
