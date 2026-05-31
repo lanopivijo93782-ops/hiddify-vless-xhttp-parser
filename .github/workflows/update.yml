@@ -45,11 +45,16 @@ jobs:
           echo "----- report -----"
           cat sub/report.json
 
+      - name: Sync subscription into GitHub Pages site
+        run: |
+          mkdir -p docs/sub
+          cp sub/vless.txt sub/subscription.txt sub/report.json docs/sub/
+
       - name: Commit updated subscription
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add sub/
+          git add sub/ docs/sub/
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else

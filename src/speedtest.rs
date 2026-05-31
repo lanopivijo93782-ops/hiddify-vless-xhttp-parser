@@ -159,14 +159,14 @@ mod tests {
         let fast = TestedNode {
             node: node.clone(),
             ip: "1.1.1.1".parse().unwrap(),
-            provider: "cloudflare".into(),
+            provider: "yandex".into(),
             latency: Some(Duration::from_millis(500)),
             throughput_kbps: Some(50_000.0),
         };
         let low_latency = TestedNode {
             node,
             ip: "1.1.1.1".parse().unwrap(),
-            provider: "cloudflare".into(),
+            provider: "yandex".into(),
             latency: Some(Duration::from_millis(10)),
             throughput_kbps: None,
         };

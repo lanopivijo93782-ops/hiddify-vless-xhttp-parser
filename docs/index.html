@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🇷🇺 RU VLESS · Подписка для Hiddify</title>
+  <meta name="description" content="Бесплатная подписка VLESS + XHTTP для Hiddify. Только российские сети (VK, Яндекс, МТС, Билайн и др.). Автообновление каждые 6 часов." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <header class="hero">
+    <div class="brand">
+      <span class="logo">🇷🇺</span>
+      <span class="brand-name">RU&nbsp;VLESS</span>
+    </div>
+    <h1>Бесплатная подписка <span class="accent">VLESS + XHTTP</span><br />для Hiddify</h1>
+    <p class="subtitle">
+      Только проверенные российские сети — VK, Яндекс, МТС, Билайн, МегаФон,
+      Ростелеком, Tele2, ЭР-Телеком, ТТК. Серверы отбираются по скорости и
+      обновляются автоматически каждые&nbsp;6&nbsp;часов.
+    </p>
+    <span class="badge" id="status-badge">● Обновлено автоматически</span>
+  </header>
+
+  <main>
+    <!-- Главная карточка подписки -->
+    <section class="card subscribe-card">
+      <div class="subscribe-left">
+        <h2>Подключиться за 10 секунд</h2>
+        <ol class="steps">
+          <li>Установите приложение <a href="https://hiddify.com/" target="_blank" rel="noopener">Hiddify</a>.</li>
+          <li>Нажмите <b>«Добавить в Hiddify»</b> или скопируйте ссылку.</li>
+          <li>Готово — выберите быстрый сервер и подключайтесь.</li>
+        </ol>
+
+        <div class="actions">
+          <a class="btn btn-primary" id="import-btn" href="#">
+            <span class="btn-icon">⚡</span> Добавить в Hiddify
+          </a>
+          <button class="btn btn-ghost" id="copy-btn">
+            <span class="btn-icon">📋</span> Скопировать ссылку
+          </button>
+        </div>
+
+        <div class="url-box" id="url-box" title="Нажмите, чтобы скопировать"></div>
+      </div>
+
+      <div class="subscribe-right">
+        <div class="qr-wrap">
+          <img id="qr" alt="QR-код подписки" width="220" height="220" />
+          <span class="qr-hint">Отсканируйте камерой Hiddify</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Статистика -->
+    <section class="stats">
+      <div class="stat card">
+        <div class="stat-num" id="stat-total">—</div>
+        <div class="stat-label">Активных серверов</div>
+      </div>
+      <div class="stat card">
+        <div class="stat-num" id="stat-providers">—</div>
+        <div class="stat-label">Провайдеров</div>
+      </div>
+      <div class="stat card">
+        <div class="stat-num" id="stat-updated">—</div>
+        <div class="stat-label">Обновлено (UTC)</div>
+      </div>
+      <div class="stat card">
+        <div class="stat-num">VLESS<span class="dim">+XHTTP</span></div>
+        <div class="stat-label">Протокол / транспорт</div>
+      </div>
+    </section>
+
+    <!-- Провайдеры -->
+    <section class="card">
+      <h2>Серверы по провайдерам</h2>
+      <div class="providers" id="providers">
+        <span class="muted">Загрузка статистики…</span>
+      </div>
+    </section>
+
+    <!-- Список серверов -->
+    <section class="card">
+      <h2>Список серверов <span class="muted" id="srv-count"></span></h2>
+      <div class="server-list" id="server-list">
+        <span class="muted">Загрузка списка…</span>
+      </div>
+    </section>
+
+    <!-- О сервисе -->
+    <section class="card about">
+      <h2>Как это работает</h2>
+      <p>
+        Парсер собирает VLESS-конфиги из десятков публичных GitHub-коллекторов,
+        оставляет <b>только VLESS + XHTTP</b>, резолвит каждый хост в IP и
+        сверяет с CIDR-диапазонами российских провайдеров (данные из RIPEstat).
+        Затем измеряет латентность и ранжирует серверы — лучшие первыми.
+      </p>
+      <p class="muted">
+        Имена ключей в формате <code>🇷🇺:YA #01 · 35ms</code> — флаг страны,
+        провайдер, ранг и скорость. Открытый исходный код:
+        <a href="https://github.com/lanopivijo93782-ops/hiddify-vless-xhttp-parser" target="_blank" rel="noopener">GitHub</a>.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      🇷🇺 RU VLESS · Эксклюзивно для Hiddify ·
+      <a href="https://github.com/lanopivijo93782-ops/hiddify-vless-xhttp-parser" target="_blank" rel="noopener">Исходный код</a>
+    </p>
+    <p class="muted small">
+      Сервис предоставляет агрегированные публичные конфигурации «как есть».
+      Используйте в соответствии с законодательством вашей страны.
+    </p>
+  </footer>
+
+  <div class="toast" id="toast">Ссылка скопирована</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
