@@ -1,0 +1,32 @@
+# Public subscription sources aggregated from popular GitHub VPN-config collectors.
+# One URL per line. Lines starting with '#' are ignored.
+# Content may be plain text or base64; VLESS share-links are extracted from both.
+# These are filtered down to VLESS + XHTTP on known networks by the pipeline,
+# so listing broad aggregators here is fine.
+# All URLs below were verified reachable (HTTP 200). Dead links are skipped at
+# runtime with a warning, so the pipeline is resilient to sources going away.
+
+# barry-far/V2ray-Config
+https://raw.githubusercontent.com/barry-far/V2ray-Config/main/All_Configs_Sub.txt
+https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/vless.txt
+
+# Epodonios/v2ray-configs
+https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/vless.txt
+https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/All_Configs_Sub.txt
+
+# mahdibland aggregators
+https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt
+https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/Eternity.txt
+
+# MhdiTaheri/V2rayCollector
+https://raw.githubusercontent.com/MhdiTaheri/V2rayCollector/main/sub/mix
+
+# Surfboardv2ray/Proxy-sorter
+https://raw.githubusercontent.com/Surfboardv2ray/Proxy-sorter/main/submerge/converted.txt
+
+# ALIILAPRO/v2rayNG-Config
+https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/sub.txt
+https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/server.txt
+
+# Pawdroid/Free-servers
+https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub

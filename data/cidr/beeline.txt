@@ -1,0 +1,10 @@
+# Beeline / VimpelCom (PJSC VimpelCom). ASN: AS8402, AS3216, AS16345.
+# Refresh with: hiddify-parser update-cidr
+85.26.0.0/16
+83.220.224.0/19
+89.179.0.0/16
+90.150.0.0/16
+91.144.128.0/17
+95.29.0.0/16
+176.59.0.0/16
+178.176.0.0/15

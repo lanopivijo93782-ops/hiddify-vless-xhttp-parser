@@ -1,0 +1,58 @@
+name: Update subscription
+
+on:
+  schedule:
+    # Every 6 hours.
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      max_nodes:
+        description: "Max nodes to keep"
+        required: false
+        default: "200"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-subscription
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Generate subscription
+        run: |
+          ./target/release/hiddify-parser run \
+            --max-nodes "${{ github.event.inputs.max_nodes || 200 }}" \
+            --connect-timeout-ms 2500 \
+            --out sub
+          echo "----- report -----"
+          cat sub/report.json
+
+      - name: Commit updated subscription
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sub/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: update subscription [skip ci]"
+            git push
+          fi
