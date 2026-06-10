@@ -1,8 +1,9 @@
 {
-  "generated_at": "2026-06-09T19:58:12Z",
-  "total": 22,
+  "generated_at": "2026-06-10T02:37:48Z",
+  "total": 33,
   "by_provider": {
-    "mts": 9,
-    "yandex": 13
+    "mts": 12,
+    "vk": 4,
+    "yandex": 17
   }
 }
