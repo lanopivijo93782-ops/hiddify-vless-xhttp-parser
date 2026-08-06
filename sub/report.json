@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-06T13:44:18Z",
-  "total": 25,
+  "generated_at": "2026-08-06T23:51:29Z",
+  "total": 23,
   "by_provider": {
-    "beeline": 1,
-    "megafon": 11,
+    "beeline": 4,
+    "megafon": 6,
     "mts": 8,
     "yandex": 5
   }
