@@ -1,1 +1,1 @@
-vless://fc07967d-925b-4246-a535-9527a8242a16@217.198.169.86:443?encryption=none&fp=chrome&packetEncoding=xudp&path=%2Fwk7Lj2YbQfCoLCnY5dZ3&pbk=h5rOWssRWMnFJ0Ka0%2DPwBwwg3PMPifPShXutXEoj2QM&security=reality&sid=b8ac5fcfceca&sni=avatars%2Emds%2Eyandex%2Enet&type=xhttp#%F0%9F%87%B7%F0%9F%87%BA%3AYA%20%2301%20%C2%B7%20130ms
+
