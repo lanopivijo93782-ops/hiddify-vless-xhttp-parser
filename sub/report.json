@@ -1,5 +1,7 @@
 {
-  "generated_at": "2026-08-29T01:21:46Z",
-  "total": 0,
-  "by_provider": {}
+  "generated_at": "2026-08-29T12:00:46Z",
+  "total": 1,
+  "by_provider": {
+    "megafon": 1
+  }
 }
