@@ -1,5 +1,7 @@
 {
-  "generated_at": "2026-09-27T20:39:03Z",
-  "total": 0,
-  "by_provider": {}
+  "generated_at": "2026-09-28T02:44:13Z",
+  "total": 1,
+  "by_provider": {
+    "yandex": 1
+  }
 }
