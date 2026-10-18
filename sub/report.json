@@ -1,10 +1,8 @@
 {
-  "generated_at": "2026-10-18T15:08:14Z",
-  "total": 6,
+  "generated_at": "2026-10-18T19:53:45Z",
+  "total": 4,
   "by_provider": {
     "megafon": 1,
-    "mts": 1,
-    "vk": 3,
-    "yandex": 1
+    "vk": 3
   }
 }
