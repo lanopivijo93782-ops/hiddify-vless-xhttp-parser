@@ -1,2 +1,2 @@
-vless://e9958027-03be-4eb5-bcec-70415b2e4844@66.90.91.122:443?alpn=h2&fp=firefox&security=tls&sni=6b014610%2De9958027%2Eferrin%2Euk&type=xhttp#%F0%9F%87%B7%F0%9F%87%BA%3ABeeline%20%2301%20%C2%B7%20127ms
-vless://37af0181-5598-4aad-a040-d926bcb65757@185.86.145.173:443?encryption=none&extra=null&fp=ios&path=%2Fapi%2Fv1%2Fupload&security=tls&sni=wholebeam%2Ecom&type=xhttp#%F0%9F%87%B7%F0%9F%87%BA%3AVK%20%2302%20%C2%B7%20128ms
+vless://e9958027-03be-4eb5-bcec-70415b2e4844@66.90.91.122:443?alpn=h2&fp=firefox&security=tls&sni=6b014610%2De9958027%2Eferrin%2Euk&type=xhttp#%F0%9F%87%B7%F0%9F%87%BA%3ABeeline%20%2301%20%C2%B7%20117ms
+vless://37af0181-5598-4aad-a040-d926bcb65757@185.86.145.173:443?encryption=none&extra=null&fp=chrome&host=wholebeam%2Ecom&mode=auto&path=%2Fapi%2Fv1%2Fupload&security=tls&sni=wholebeam%2Ecom&type=xhttp#%F0%9F%87%B7%F0%9F%87%BA%3AVK%20%2302%20%C2%B7%20129ms
