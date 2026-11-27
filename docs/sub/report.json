@@ -1,8 +1,9 @@
 {
-  "generated_at": "2026-11-26T16:04:16Z",
-  "total": 2,
+  "generated_at": "2026-11-27T01:19:19Z",
+  "total": 3,
   "by_provider": {
-    "vk": 1,
+    "beeline": 1,
+    "rostelecom": 1,
     "yandex": 1
   }
 }
