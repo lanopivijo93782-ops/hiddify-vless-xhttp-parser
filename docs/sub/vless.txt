@@ -1,1 +1,2 @@
-
+vless://52d0c9b1-80aa-4b20-bcb1-849991560498@td.vmagnum.win:443?encryption=none&fp=chrome&security=tls&sni=52d0c9b1%2Eferrin%2Euk&type=xhttp#%F0%9F%87%B7%F0%9F%87%BA%3ABeeline%20%2301%20%C2%B7%20116ms
+vless://ef1da56e-8117-42b4-bcd8-9094ebbdf985@130.193.35.149:8444?fp=chrome&mode=auto&path=%2F9e3ee801bb41b934&pbk=TJjBxMqU12PD9TQ9ZVr%2Dm%2DLdIxYVokVp5SImQ6Z2iEQ&security=reality&sid=b8b1d46f23be2a8c&sni=hel%2Esoftriver%2Esite&type=xhttp#%F0%9F%87%B7%F0%9F%87%BA%3AYA%20%2302%20%C2%B7%20145ms
